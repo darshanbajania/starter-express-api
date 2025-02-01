@@ -18,10 +18,10 @@ app.use(express.json());
 
 app.get("/test", async (req, res) => {
   let data;
-  res.send("Hello World!" + process.env.MISTRAL_API_KEY);
-  const response = await mistralAIChat();
+  const response = await mistralAIChat("what is 100/5?");
+  res.send("Hello World!" + process.env.MISTRAL_API_KEY + response);
 
-  console.log("Chat:", response.choices[0].message.content);
+  console.log("Chat:");
 });
 
 app.post("/", async (req, resp) => {
@@ -51,8 +51,11 @@ app.post("/", async (req, resp) => {
 app.post("/solve", async (req, res) => {
   const queryText = req.body.queryText;
 
-  const response = await openAIChat([]);
-  const data = response.data;
+  // const response = await openAIChat([]);
+  const response = await mistralAIChat(queryText);
+  // const data = response.data;
+  const data = JSON.stringify(response);
+
   // const data = JSON.stringify(queryText)
   console.log("solved", queryText);
   res.send(data);
