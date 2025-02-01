@@ -3,6 +3,7 @@ let dotenv = require("dotenv").config();
 const app = express();
 
 const { Configuration, OpenAIApi } = require("openai");
+const { Mistral } = require("@mistralai/mistralai");
 const cors = require("cors");
 
 const router = express.Router();
@@ -12,6 +13,8 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const mistralClient = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
+
 app.use(
   express.urlencoded({
     extended: true,
@@ -20,9 +23,15 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
-app.get("/test", (req, res) => {
+app.get("/test", async (req, res) => {
   let data;
-  res.send("Hello World!" + process.env.OPENAI_API_KEY);
+  res.send("Hello World!" + process.env.MISTRAL_API_KEY);
+  const chatResponse = await mistralClient.chat.complete({
+    model: "mistral-tiny",
+    messages: [{ role: "user", content: "What is the best French cheese?" }],
+  });
+
+  console.log("Chat:", chatResponse.choices[0].message.content);
 });
 
 app.post("/", async (req, resp) => {
@@ -62,7 +71,7 @@ A:130
 Q: ${queryText}
 A:`;
   const response = await openai.createCompletion({
-    model: "text-davinci-003",
+    model: "gpt-4o-mini",
     prompt: promptText,
     temperature: 0,
     max_tokens: 7,
