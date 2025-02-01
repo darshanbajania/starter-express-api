@@ -3,8 +3,9 @@ let dotenv = require("dotenv").config();
 const app = express();
 
 const { Configuration, OpenAIApi } = require("openai");
-const { Mistral } = require("@mistralai/mistralai");
+
 const cors = require("cors");
+const { mistralAIChat } = require("./utils/models/mistralai");
 
 const router = express.Router();
 
@@ -12,8 +13,6 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
-const mistralClient = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 
 app.use(
   express.urlencoded({
@@ -26,12 +25,9 @@ app.use(express.json());
 app.get("/test", async (req, res) => {
   let data;
   res.send("Hello World!" + process.env.MISTRAL_API_KEY);
-  const chatResponse = await mistralClient.chat.complete({
-    model: "mistral-tiny",
-    messages: [{ role: "user", content: "What is the best French cheese?" }],
-  });
+  const response = await mistralAIChat();
 
-  console.log("Chat:", chatResponse.choices[0].message.content);
+  console.log("Chat:", response.choices[0].message.content);
 });
 
 app.post("/", async (req, resp) => {
