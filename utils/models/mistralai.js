@@ -27,7 +27,7 @@ const mistralAIChat = async (
   ];
 
   const chatResponse = await mistralClient.chat.complete({
-    model: "mistral-small-latest",
+    model: "mistral-large-latest",
     messages: [...systemMessage, { role: "user", content: "Q: " + messages }],
     maxTokens: 20,
   });
